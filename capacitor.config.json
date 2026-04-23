@@ -1,0 +1,6 @@
+{
+  "appId": "com.yourname.eggclicker",
+  "appName": "Яєчний Інкубатор",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
