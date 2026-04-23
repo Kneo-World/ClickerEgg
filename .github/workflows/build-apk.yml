@@ -1,0 +1,48 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # дозволяє запускати вручну з GitHub UI
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout репозиторій
+        uses: actions/checkout@v4
+
+      - name: Встановлюємо Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Встановлюємо Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Встановлюємо Android SDK та необхідні інструменти
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platforms;android-34 build-tools;34.0.0'
+
+      - name: Встановлюємо залежності
+        run: npm install
+
+      - name: Додаємо платформу Android
+        run: npx cap add android
+
+      - name: Синхронізуємо www з Android проєктом
+        run: npx cap sync
+
+      - name: Збираємо debug APK
+        run: cd android && ./gradlew assembleDebug
+
+      - name: Завантажуємо APK як артефакт
+        uses: actions/upload-artifact@v4
+        with:
+          name: egg-clicker-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
