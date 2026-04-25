@@ -1,12 +1,15 @@
 {
   "name": "egg-clicker",
-  "version": "1.0.0",
-  "description": "Яєчний Інкубатор - APK через GitHub Actions",
+  "version": "2.2.0",
+  "description": "Яєчний Інкубатор Мега",
   "scripts": {
-    "build": "echo 'No build step needed'"
+    "build": "echo 'No build step'"
   },
   "devDependencies": {
     "@capacitor/cli": "^6.0.0",
-    "@capacitor/android": "^6.0.0"
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/filesystem": "^6.0.0",
+    "@capacitor/share": "^6.0.0",
+    "@capacitor/local-notifications": "^6.0.0"
   }
 }
