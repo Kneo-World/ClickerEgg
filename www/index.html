@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Яєчний Інкубатор 2.2 Lite 🥚</title>
+  <title>Яєчний Інкубатор 2.3 🥚</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -43,132 +43,63 @@
     .stat { display: flex; flex-direction: column; align-items: center; }
     .stat-value { font-size: 1.8rem; color: #ffeAA0; }
     .egg-area { position: relative; margin: 15px 0; }
-    .egg-container {
-      cursor: pointer;
-      display: inline-block;
-      transition: transform 0.05s;
-      position: relative;
-    }
+    .egg-container { cursor: pointer; display: inline-block; transition: transform 0.05s; position: relative; }
     .egg-container:active { transform: scale(0.88); }
-    .egg-img {
-      font-size: 7rem;
-      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6));
-      transition: 0.2s;
-    }
+    .egg-img { font-size: 7rem; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6)); transition: 0.2s; }
     .float-text {
-      position: absolute;
-      color: #ffe484;
-      font-weight: bold;
-      font-size: 1.8rem;
-      pointer-events: none;
-      animation: floatAnim 0.9s ease-out forwards;
-      white-space: nowrap;
+      position: absolute; color: #ffe484; font-weight: bold; font-size: 1.8rem;
+      pointer-events: none; animation: floatAnim 0.9s ease-out forwards; white-space: nowrap;
       text-shadow: 0 2px 5px black;
     }
     @keyframes floatAnim {
       0% { opacity: 1; transform: translateY(0); }
       100% { opacity: 0; transform: translateY(-90px) scale(1.3); }
     }
-    .boost-bar {
-      height: 6px;
-      background: #444;
-      border-radius: 3px;
-      margin: 8px 0;
-      overflow: hidden;
-      display: none;
+    .fast-upgrades {
+      display: flex; justify-content: center; gap: 10px; margin: 10px 0; flex-wrap: wrap;
     }
-    .boost-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #f90, #ff0);
-      transition: width 0.1s linear;
+    .fast-btn {
+      background: #b85e0c; color: white; font-weight: bold; padding: 8px 14px; border-radius: 25px;
+      border: none; cursor: pointer; font-size: 0.85rem; white-space: nowrap;
     }
-    .tabs {
-      display: flex;
-      margin: 10px 0 5px;
-      background: #00000033;
-      border-radius: 25px;
-      overflow: hidden;
-    }
-    .tab {
-      flex: 1;
-      padding: 10px 5px;
-      background: transparent;
-      border: none;
-      color: #ccaa88;
-      font-weight: bold;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: 0.2s;
-    }
+    .fast-btn:disabled { background: #555; color: #aaa; }
+    .boost-bar { height: 6px; background: #444; border-radius: 3px; margin: 8px 0; overflow: hidden; display: none; }
+    .boost-fill { height: 100%; background: linear-gradient(90deg, #f90, #ff0); transition: width 0.1s linear; }
+    .tabs { display: flex; margin: 10px 0 5px; background: #00000033; border-radius: 25px; overflow: hidden; }
+    .tab { flex: 1; padding: 10px 5px; background: transparent; border: none; color: #ccaa88; font-weight: bold; font-size: 0.85rem; cursor: pointer; transition: 0.2s; }
     .tab.active { background: #b8753b; color: white; box-shadow: inset 0 -3px 0 #ffe484; }
-    .panel {
-      max-height: 380px;
-      overflow-y: auto;
-      background: #00000022;
-      border-radius: 20px;
-      padding: 10px;
-      scrollbar-width: thin;
-    }
+    .panel { max-height: 380px; overflow-y: auto; background: #00000022; border-radius: 20px; padding: 10px; scrollbar-width: thin; }
     .upgrade, .prestige-item, .achievement, .shop-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #ffffff10;
-      border-radius: 18px;
-      padding: 10px;
-      margin: 6px 0;
-      gap: 8px;
-      text-align: left;
-      flex-wrap: wrap;
+      display: flex; justify-content: space-between; align-items: center; background: #ffffff10;
+      border-radius: 18px; padding: 10px; margin: 6px 0; gap: 8px; text-align: left; flex-wrap: wrap;
     }
     .upgrade-info, .prestige-info { flex: 2; min-width: 150px; }
     .upgrade-name, .prestige-name, .shop-name { font-weight: bold; font-size: 1rem; }
     .upgrade-desc, .shop-desc { font-size: 0.75rem; opacity: 0.8; }
     button {
-      background: #ea933b;
-      border: none;
-      color: white;
-      font-weight: bold;
-      padding: 8px 14px;
-      border-radius: 30px;
-      cursor: pointer;
-      transition: 0.2s;
-      white-space: nowrap;
-      font-size: 0.9rem;
+      background: #ea933b; border: none; color: white; font-weight: bold; padding: 8px 14px;
+      border-radius: 30px; cursor: pointer; transition: 0.2s; white-space: nowrap; font-size: 0.9rem;
     }
     button:disabled { background: #555; color: #aaa; }
     button:not(:disabled):hover { filter: brightness(1.2); }
     .gold-btn { background: #d4a017; }
     .boost-btn { background: #4caf50; }
     .small-btn { background: #444; padding: 6px 14px; font-size: 0.8rem; }
-    .share-btn { background: #1e88e5; }
-    .daily-btn { background: #ab47bc; font-size: 1rem; width: 100%; }
+    .settings-btn { background: #607d8b; }
+    .daily-btn { background: #ab47bc; font-size: 1rem; width: 100%; margin-top: 10px; }
+    .quest-item { display: flex; align-items: center; gap: 10px; background: #ffffff10; border-radius: 15px; padding: 8px; margin: 5px 0; }
+    .quest-progress { flex: 1; height: 8px; background: #444; border-radius: 4px; overflow: hidden; }
+    .quest-fill { height: 100%; background: #ffd700; }
     .event-btn {
-      position: fixed;
-      bottom: 80px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #f44336;
-      font-size: 2rem;
-      padding: 15px 30px;
-      border-radius: 60px;
-      box-shadow: 0 0 30px gold;
-      z-index: 1000;
-      animation: pulse 0.8s infinite;
+      position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #f44336;
+      font-size: 2rem; padding: 15px 30px; border-radius: 60px; box-shadow: 0 0 30px gold;
+      z-index: 1000; animation: pulse 0.8s infinite;
     }
     @keyframes pulse { 0% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.1); } 100% { transform: translateX(-50%) scale(1); } }
     .notification {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #2e1e0e;
-      color: #ffcc88;
-      padding: 12px 25px;
-      border-radius: 30px;
-      box-shadow: 0 5px 20px black;
-      font-weight: bold;
-      z-index: 999;
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      background: #2e1e0e; color: #ffcc88; padding: 12px 25px; border-radius: 30px;
+      box-shadow: 0 5px 20px black; font-weight: bold; z-index: 999;
       animation: slideDown 0.5s ease, fadeOut 0.5s 2.5s forwards;
     }
     @keyframes slideDown { from { top: -80px; opacity: 0; } to { top: 20px; opacity: 1; } }
@@ -176,12 +107,34 @@
     .footer-buttons { display: flex; gap: 8px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
     #exportImport { display: none; margin-top: 8px; gap: 5px; flex-direction: column; }
     #saveString { flex: 1; padding: 8px; border-radius: 15px; border: none; background: #fff3e0; width: 100%; }
+    .achievements-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .tooltip {
+      position: relative; display: inline-block; width: 20px; height: 20px;
+      background: #607d8b; color: white; border-radius: 50%; text-align: center;
+      line-height: 20px; font-size: 0.8rem; cursor: pointer; margin-left: 5px;
+    }
+    .tooltip .tooltiptext {
+      visibility: hidden; width: 180px; background: #222; color: #fff; text-align: center;
+      border-radius: 10px; padding: 8px; position: absolute; z-index: 10; bottom: 125%;
+      left: 50%; transform: translateX(-50%); font-size: 0.75rem; opacity: 0; transition: opacity 0.2s;
+    }
+    .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+    .settings-panel {
+      display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      background: #1e1208; border: 2px solid gold; border-radius: 25px; padding: 20px;
+      z-index: 100; width: 90%; max-width: 350px; text-align: left;
+    }
+    .setting-row { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; }
+    .setting-toggle { width: 50px; height: 25px; background: #555; border-radius: 15px; position: relative; cursor: pointer; }
+    .setting-toggle.active { background: #4caf50; }
+    .setting-toggle::after { content: ''; position: absolute; width: 21px; height: 21px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: 0.2s; }
+    .setting-toggle.active::after { left: 27px; }
   </style>
 </head>
 <body>
 <div id="app">
   <h1>🥚 Яєчний Інкубатор</h1>
-  <div class="version">v2.2 Lite · Безпечна версія</div>
+  <div class="version">v2.3 · Fast Upgrade · Квесты · Баланс</div>
   <div class="stats">
     <div class="stat"><span class="stat-value" id="eggDisplay">0</span>🥚</div>
     <div class="stat"><span class="stat-value" id="epsDisplay">0</span>/с</div>
@@ -194,25 +147,29 @@
     </div>
     <div id="floatContainer"></div>
   </div>
+  <div class="fast-upgrades" id="fastUpgrades"></div>
   <button class="boost-btn" id="activateBoost">⚡ Буст x2 (<span id="boostCost">5000</span>🥚)</button>
   <button class="daily-btn" id="dailyBtn" style="display:none;">🎁 Забрати щоденний бонус</button>
 
   <div class="tabs">
-    <button class="tab active" id="tabUpgrades">🔧 Покращення</button>
-    <button class="tab" id="tabShop">🛍️ Магазин</button>
-    <button class="tab" id="tabPrestige">🌟 Престиж</button>
-    <button class="tab" id="tabAchievements">🏆 Досягнення</button>
+    <button class="tab active" id="tabUpgrades">🔧</button>
+    <button class="tab" id="tabShop">🛍️</button>
+    <button class="tab" id="tabPrestige">🌟</button>
+    <button class="tab" id="tabAchievements">🏆</button>
+    <button class="tab" id="tabQuests">🎯</button>
   </div>
 
   <div id="upgradesPanel" class="panel"></div>
   <div id="shopPanel" class="panel" style="display:none;"></div>
   <div id="prestigePanel" class="panel" style="display:none;"></div>
   <div id="achievementsPanel" class="panel" style="display:none;"></div>
+  <div id="questsPanel" class="panel" style="display:none;"></div>
 
   <div class="footer-buttons">
-    <button class="small-btn" id="saveBtn">💾 Зберегти</button>
-    <button class="small-btn" id="exportBtn">📋 Копіювати</button>
-    <button class="small-btn" id="resetBtn">🔄 Скинути все</button>
+    <button class="small-btn" id="saveBtn">💾</button>
+    <button class="small-btn settings-btn" id="settingsBtn">⚙️</button>
+    <button class="small-btn" id="exportBtn">📋</button>
+    <button class="small-btn" id="resetBtn">🔄</button>
   </div>
   <div id="exportImport">
     <input id="saveString" placeholder="Вставте код збереження..." />
@@ -220,9 +177,18 @@
   </div>
 </div>
 
+<!-- Панель налаштувань -->
+<div class="settings-panel" id="settingsPanel">
+  <h3>⚙️ Налаштування</h3>
+  <div class="setting-row">
+    <span>📳 Вібрація при кліку</span>
+    <div class="setting-toggle active" id="vibroToggle"></div>
+  </div>
+  <button id="closeSettings" style="margin-top: 15px; width: 100%;">Закрити</button>
+</div>
+
 <script>
 (function() {
-  // ---------- СТАН ГРИ ----------
   const defaultState = {
     eggs: 0,
     goldEggs: 0,
@@ -235,7 +201,9 @@
     achievements: [],
     boostUntil: null,
     prestigeShop: { startingEggs: 0, clickPower: 0, costReduction: 0 },
-    lastDailyClaim: null
+    lastDailyClaim: null,
+    vibroEnabled: true,
+    dailyQuests: { date: null, quests: [] } // { id, type, target, progress, rewardEggs, rewardGold }
   };
 
   let state = JSON.parse(JSON.stringify(defaultState));
@@ -255,23 +223,24 @@
   ];
 
   const shopItems = [
-    { id: 'goldenNest',   name: 'Золоте гніздо',      desc: 'Миттєво +50% до EPS',            cost: 500000,   effect: 'epsMult', val: 1.5 },
-    { id: 'teleport',     name: 'Телепорт яєць',       desc: 'Автоклік +10/с',                 cost: 2000000,  effect: 'autoclick', val: 10 },
-    { id: 'eggTower',     name: 'Яєчна вежа',          desc: '+10 до сили кліку',              cost: 1000000,  effect: 'click', val: 10 },
-    { id: 'incubator3k',  name: 'Інкубатор 3000',      desc: '+25 000 яєць/с',                 cost: 15000000, effect: 'eps', val: 25000 },
-    { id: 'quantumLink',  name: 'Квантовий зв\'язок',  desc: 'Множник EPS x1.2',              cost: 8000000,  effect: 'epsMult', val: 1.2 },
-    { id: 'dragonEgg',    name: 'Яйце дракона',        desc: 'Крит. шанс +20%',               cost: 12000000, effect: 'critAdd', val: 0.2 },
-    { id: 'cosmicPortal', name: 'Міжвимірний портал',  desc: 'Автоклік +100/с',               cost: 30000000, effect: 'autoclick', val: 100 }
+    { id: 'goldenNest',   name: 'Золоте гніздо',      desc: '+50% EPS',               cost: 5000000,   effect: 'epsMult', val: 1.5 },
+    { id: 'teleport',     name: 'Телепорт яєць',       desc: 'Автоклік +10/с',         cost: 15000000,  effect: 'autoclick', val: 10 },
+    { id: 'eggTower',     name: 'Яєчна вежа',          desc: '+10 до сили кліку',      cost: 10000000,  effect: 'click', val: 10 },
+    { id: 'incubator3k',  name: 'Інкубатор 3000',      desc: '+25 000 яєць/с',         cost: 50000000,  effect: 'eps', val: 25000 },
+    { id: 'quantumLink',  name: 'Квантовий зв\'язок',  desc: 'Множник EPS x1.2',      cost: 80000000,  effect: 'epsMult', val: 1.2 },
+    { id: 'dragonEgg',    name: 'Яйце дракона',        desc: 'Крит. шанс +20%',       cost: 120000000, effect: 'critAdd', val: 0.2 },
+    { id: 'cosmicPortal', name: 'Міжвимірний портал',  desc: 'Автоклік +100/с',       cost: 300000000, effect: 'autoclick', val: 100 },
+    { id: 'timeMachine',  name: 'Машина часу',         desc: 'EPS x2 назавжди',       cost: 500000000, effect: 'epsMult', val: 2 }
   ];
 
   const achievementsList = [
     { id: 'first100', name: 'Перша сотня', desc: '100 яєць', check: s => s.eggs >= 100 },
     { id: 'clicker', name: 'Клікер', desc: '50 кліків', check: s => s.totalClicks >= 50 },
     { id: 'chickenLord', name: 'Курячий лорд', desc: '5 курок', check: s => (s.upgrades['chicken']||0) >= 5 },
-    { id: 'golden1', name: 'Перше золото', desc: 'Здобути золоте яйце', check: s => s.goldEggs + s.prestigeMultiplier >= 1 },
-    { id: 'rich', name: 'Мільйонер', desc: '1 000 000 яєць', check: s => s.eggs >= 1_000_000 },
+    { id: 'golden1', name: 'Перше золото', desc: 'Золоте яйце', check: s => s.goldEggs + s.prestigeMultiplier >= 1 },
+    { id: 'rich', name: 'Мільйонер', desc: '1M яєць', check: s => s.eggs >= 1_000_000 },
     { id: 'robotArmy', name: 'Армія роботів', desc: '10 робо-рук', check: s => (s.upgrades['robot']||0) >= 10 },
-    { id: 'speed', name: 'Швидкість', desc: 'EPS > 10 000', check: s => calculateEPS() > 10000 },
+    { id: 'speed', name: 'Швидкість', desc: 'EPS > 10k', check: s => calculateEPS() > 10000 },
   ];
 
   function getUpgradeCost(id) {
@@ -279,10 +248,8 @@
     if (!u) return Infinity;
     const owned = state.upgrades[id] || 0;
     let base = u.baseCost;
-    if (state.prestigeShop && state.prestigeShop.costReduction) {
-      base *= (1 - state.prestigeShop.costReduction / 100);
-    }
-    return Math.floor(base * Math.pow(1.15, owned));
+    if (state.prestigeShop.costReduction) base *= (1 - state.prestigeShop.costReduction / 100);
+    return Math.floor(base * Math.pow(1.2, owned)); // Збільшено коефіцієнт
   }
 
   function calculateEPS() {
@@ -304,14 +271,10 @@
   }
 
   function getClickPower() {
-    let base = 1 + (state.upgrades['hand'] || 0) + (state.prestigeShop.clickPower || 0);
-    shopItems.forEach(item => {
-      if (state.shopUpgrades[item.id] && item.effect === 'click') base += item.val;
-    });
+    let base = 1 + (state.upgrades['hand'] || 0) + state.prestigeShop.clickPower;
+    shopItems.forEach(item => { if (state.shopUpgrades[item.id] && item.effect === 'click') base += item.val; });
     let critChance = Math.min(1, (state.upgrades['goldChick'] || 0) * 0.1);
-    shopItems.forEach(item => {
-      if (state.shopUpgrades[item.id] && item.effect === 'critAdd') critChance += item.val;
-    });
+    shopItems.forEach(item => { if (state.shopUpgrades[item.id] && item.effect === 'critAdd') critChance += item.val; });
     if (Math.random() < critChance) base *= 2;
     const mult = 1 + state.prestigeMultiplier * 0.10;
     base *= mult;
@@ -332,10 +295,10 @@
     try {
       const now = Date.now();
       const last = new Date(state.lastSaveTime).getTime();
-      const diffSeconds = Math.min((now - last) / 1000, 86400);
+      const diffSeconds = Math.min((now - last) / 1000, 43200); // 12 годин макс
       if (diffSeconds < 10) return 0;
       const eps = calculateEPS();
-      const gained = eps * diffSeconds;
+      const gained = (eps * diffSeconds) / 2; // вдвічі менше
       state.eggs += gained;
       state.totalProduced += gained;
       return gained;
@@ -347,7 +310,11 @@
     notif.className = 'notification';
     notif.textContent = text;
     document.body.appendChild(notif);
-    setTimeout(() => { if (notif.parentNode) notif.remove(); }, 3000);
+    setTimeout(() => notif.remove(), 3000);
+  }
+
+  function vibrate(ms = 5) {
+    if (state.vibroEnabled && navigator.vibrate) navigator.vibrate(ms);
   }
 
   function updateEggAppearance() {
@@ -362,7 +329,51 @@
     else emoji.textContent = '🥚';
   }
 
-  // Рендеринг з додаванням обробників через addEventListener
+  // Fast Upgrade логіка
+  function getBestUpgrade(type) {
+    // type: 'click' or 'eps'
+    const possible = upgradesData.filter(u => u.effect === type && state.eggs >= getUpgradeCost(u.id));
+    if (possible.length === 0) return null;
+    possible.sort((a,b) => getUpgradeCost(a.id) - getUpgradeCost(b.id));
+    return possible[0];
+  }
+
+  function renderFastUpgrades() {
+    const container = document.getElementById('fastUpgrades');
+    container.innerHTML = '';
+    const bestClick = getBestUpgrade('click');
+    const bestEps = getBestUpgrade('eps');
+    if (bestClick) {
+      const btn = document.createElement('button');
+      btn.className = 'fast-btn';
+      btn.textContent = `👆 ${bestClick.name} (${formatNumber(getUpgradeCost(bestClick.id))})`;
+      btn.addEventListener('click', () => {
+        if (state.eggs >= getUpgradeCost(bestClick.id)) {
+          state.eggs -= getUpgradeCost(bestClick.id);
+          state.upgrades[bestClick.id] = (state.upgrades[bestClick.id]||0) + 1;
+          updateUI();
+          vibrate();
+        }
+      });
+      container.appendChild(btn);
+    }
+    if (bestEps) {
+      const btn = document.createElement('button');
+      btn.className = 'fast-btn';
+      btn.textContent = `⚡ ${bestEps.name} (${formatNumber(getUpgradeCost(bestEps.id))})`;
+      btn.addEventListener('click', () => {
+        if (state.eggs >= getUpgradeCost(bestEps.id)) {
+          state.eggs -= getUpgradeCost(bestEps.id);
+          state.upgrades[bestEps.id] = (state.upgrades[bestEps.id]||0) + 1;
+          updateUI();
+          vibrate();
+        }
+      });
+      container.appendChild(btn);
+    }
+  }
+
+  // Рендеринг панелей
   function renderUpgrades() {
     const panel = document.getElementById('upgradesPanel');
     panel.innerHTML = '';
@@ -370,27 +381,21 @@
       const owned = state.upgrades[u.id] || 0;
       const cost = getUpgradeCost(u.id);
       const canBuy = state.eggs >= cost;
-
-      const div = document.createElement('div');
-      div.className = 'upgrade';
-
-      const infoDiv = document.createElement('div');
-      infoDiv.className = 'upgrade-info';
-      infoDiv.innerHTML = `<div class="upgrade-name">${u.name} (${owned})</div><div class="upgrade-desc">${u.desc}</div>`;
-
+      const div = document.createElement('div'); div.className = 'upgrade';
+      const info = document.createElement('div'); info.className = 'upgrade-info';
+      info.innerHTML = `<div class="upgrade-name">${u.name} (${owned})</div><div class="upgrade-desc">${u.desc}</div>`;
       const btn = document.createElement('button');
-      btn.textContent = formatNumber(cost) + ' 🥚';
+      btn.textContent = `${formatNumber(cost)} 🥚`;
       btn.disabled = !canBuy;
       btn.addEventListener('click', () => {
         if (state.eggs >= getUpgradeCost(u.id)) {
           state.eggs -= getUpgradeCost(u.id);
-          state.upgrades[u.id] = (state.upgrades[u.id] || 0) + 1;
+          state.upgrades[u.id] = (state.upgrades[u.id]||0) + 1;
           updateUI();
+          vibrate();
         }
       });
-
-      div.appendChild(infoDiv);
-      div.appendChild(btn);
+      div.appendChild(info); div.appendChild(btn);
       panel.appendChild(div);
     });
   }
@@ -401,28 +406,22 @@
     shopItems.forEach(item => {
       const bought = state.shopUpgrades[item.id] === true;
       const canBuy = !bought && state.eggs >= item.cost;
-
-      const div = document.createElement('div');
-      div.className = 'shop-item';
-
-      const infoDiv = document.createElement('div');
-      infoDiv.className = 'upgrade-info';
-      infoDiv.innerHTML = `<div class="shop-name">${item.name}</div><div class="shop-desc">${item.desc}</div>`;
-
+      const div = document.createElement('div'); div.className = 'shop-item';
+      const info = document.createElement('div'); info.className = 'upgrade-info';
+      info.innerHTML = `<div class="shop-name">${item.name}</div><div class="shop-desc">${item.desc}</div>`;
       const btn = document.createElement('button');
-      btn.textContent = bought ? '✅' : formatNumber(item.cost) + ' 🥚';
+      btn.textContent = bought ? '✅' : `${formatNumber(item.cost)} 🥚`;
       btn.disabled = !canBuy;
       btn.addEventListener('click', () => {
-        if (!state.shopUpgrades[item.id] && state.eggs >= item.cost) {
+        if (!bought && state.eggs >= item.cost) {
           state.eggs -= item.cost;
           state.shopUpgrades[item.id] = true;
           updateUI();
-          showNotification('🛍️ Куплено: ' + item.name + '!');
+          showNotification('🛍️ Куплено: ' + item.name);
+          vibrate();
         }
       });
-
-      div.appendChild(infoDiv);
-      div.appendChild(btn);
+      div.appendChild(info); div.appendChild(btn);
       panel.appendChild(div);
     });
   }
@@ -430,83 +429,112 @@
   function renderPrestige() {
     const panel = document.getElementById('prestigePanel');
     panel.innerHTML = '';
+    // Ціна престижу: 5 млн за перше, +3 млн за кожне наступне
+    const baseCost = 5_000_000;
+    const increment = 3_000_000;
+    const ownedGold = state.goldEggs + state.prestigeMultiplier;
+    const nextGoldCost = baseCost + ownedGold * increment;
+    const canPrestige = state.eggs >= nextGoldCost;
 
-    const headerDiv = document.createElement('div');
-    headerDiv.className = 'prestige-info';
-    headerDiv.style.justifyContent = 'center';
-    headerDiv.style.textAlign = 'center';
-    headerDiv.style.marginBottom = '10px';
-    headerDiv.innerHTML = '<strong>🌟 Престиж</strong><br><small>Скидає звичайні яйця, покращення та магазин</small>';
-    panel.appendChild(headerDiv);
-
-    const nextGoldCost = 1_000_000 * (state.goldEggs + state.prestigeMultiplier + 1);
-    const pCost = document.createElement('p');
-    pCost.innerHTML = 'Наступне коштує: <strong>' + formatNumber(nextGoldCost) + ' 🥚</strong>';
-    panel.appendChild(pCost);
-
-    const prestigeBtn = document.createElement('button');
-    prestigeBtn.className = 'gold-btn';
-    prestigeBtn.textContent = '🌟 Здобути Золоте!';
-    prestigeBtn.disabled = state.eggs < nextGoldCost;
-    prestigeBtn.addEventListener('click', () => {
-      const cost = 1_000_000 * (state.goldEggs + state.prestigeMultiplier + 1);
-      if (state.eggs >= cost) {
-        state.eggs = (state.prestigeShop.startingEggs || 0) * 100;
-        state.upgrades = {};
-        state.shopUpgrades = {};
-        state.goldEggs++;
-        state.boostUntil = null;
+    const header = document.createElement('div'); header.className = 'prestige-info';
+    header.style.textAlign = 'center'; header.innerHTML = '<strong>🌟 Престиж</strong><br><small>Скидає яйця та покращення, дає золоте</small>';
+    panel.appendChild(header);
+    const p = document.createElement('p'); p.innerHTML = `Наступне: <strong>${formatNumber(nextGoldCost)} 🥚</strong>`;
+    panel.appendChild(p);
+    const btnPrestige = document.createElement('button'); btnPrestige.className = 'gold-btn';
+    btnPrestige.textContent = '🌟 Здобути Золоте!'; btnPrestige.disabled = !canPrestige;
+    btnPrestige.addEventListener('click', () => {
+      if (state.eggs >= nextGoldCost) {
+        state.eggs = state.prestigeShop.startingEggs * 100;
+        state.upgrades = {}; state.shopUpgrades = {};
+        state.goldEggs++; state.boostUntil = null;
         updateUI();
         showNotification('🌟 Отримано золоте яйце!');
+        vibrate();
       }
     });
-    panel.appendChild(prestigeBtn);
-
+    panel.appendChild(btnPrestige);
     panel.appendChild(document.createElement('hr'));
 
-    const shopTitle = document.createElement('h3');
-    shopTitle.textContent = '🛒 Магазин престижу';
+    const shopTitle = document.createElement('h3'); shopTitle.textContent = '🛒 Магазин престижу';
     panel.appendChild(shopTitle);
 
-    function addPrestigeItem(title, desc, cost, callback) {
-      const itemDiv = document.createElement('div');
-      itemDiv.className = 'prestige-item';
-      const infoDiv = document.createElement('div');
-      infoDiv.className = 'prestige-info';
-      infoDiv.innerHTML = `<strong>${title}</strong><br><small>${desc}</small>`;
+    function addPrestigeItem(title, desc, costGold, callback) {
+      const div = document.createElement('div'); div.className = 'prestige-item';
+      const info = document.createElement('div'); info.className = 'prestige-info';
+      info.innerHTML = `<strong>${title}</strong><br><small>${desc}</small>`;
       const btn = document.createElement('button');
-      btn.textContent = cost + ' 🥇';
-      btn.disabled = state.goldEggs < cost;
+      btn.textContent = `${costGold} 🥇`; btn.disabled = state.goldEggs < costGold;
       btn.addEventListener('click', callback);
-      itemDiv.appendChild(infoDiv);
-      itemDiv.appendChild(btn);
-      panel.appendChild(itemDiv);
+      div.appendChild(info); div.appendChild(btn);
+      panel.appendChild(div);
     }
-
     addPrestigeItem('Глобальний множник', `+${(state.prestigeMultiplier*10).toFixed(0)}%`, 1, () => {
-      if (state.goldEggs >= 1) { state.goldEggs--; state.prestigeMultiplier++; updateUI(); }
+      if (state.goldEggs>=1) { state.goldEggs--; state.prestigeMultiplier++; updateUI(); }
     });
-    addPrestigeItem('Стартові яйця', `+100 після престижу (рів.${state.prestigeShop.startingEggs})`, 1, () => {
-      if (state.goldEggs >= 1) { state.goldEggs--; state.prestigeShop.startingEggs++; updateUI(); }
+    addPrestigeItem('Стартові яйця', `+100 (рів.${state.prestigeShop.startingEggs})`, 1, () => {
+      if (state.goldEggs>=1) { state.goldEggs--; state.prestigeShop.startingEggs++; updateUI(); }
     });
     addPrestigeItem('Сила кліку', `+1 (рів.${state.prestigeShop.clickPower})`, 2, () => {
-      if (state.goldEggs >= 2) { state.goldEggs -= 2; state.prestigeShop.clickPower++; updateUI(); }
+      if (state.goldEggs>=2) { state.goldEggs -= 2; state.prestigeShop.clickPower++; updateUI(); }
     });
     addPrestigeItem('Знижка', `-5% (рів.${state.prestigeShop.costReduction}%)`, 3, () => {
-      if (state.goldEggs >= 3) { state.goldEggs -= 3; state.prestigeShop.costReduction += 5; updateUI(); }
+      if (state.goldEggs>=3) { state.goldEggs -= 3; state.prestigeShop.costReduction += 5; updateUI(); }
     });
   }
 
   function renderAchievements() {
     const panel = document.getElementById('achievementsPanel');
-    panel.innerHTML = '';
+    panel.innerHTML = '<div class="achievements-grid"></div>';
+    const grid = panel.querySelector('.achievements-grid');
     achievementsList.forEach(a => {
       const earned = state.achievements.includes(a.id);
-      const div = document.createElement('div');
-      div.className = 'achievement';
+      const div = document.createElement('div'); div.className = 'achievement';
       div.style.opacity = earned ? '1' : '0.4';
       div.innerHTML = `<div>🏆 <strong>${a.name}</strong><br><small>${a.desc}</small></div><span>${earned ? '✅' : '🔒'}</span>`;
+      grid.appendChild(div);
+    });
+  }
+
+  function generateDailyQuests() {
+    const quests = [
+      { id: 'buyUpgrades', type: 'buy', target: 10, progress: 0, rewardEggs: 20000, desc: 'Купити 10 покращень' },
+      { id: 'clicks', type: 'clicks', target: 200, progress: 0, rewardEggs: 15000, desc: 'Зробити 200 кліків' },
+      { id: 'earnEggs', type: 'earn', target: 500000, progress: 0, rewardEggs: 50000, rewardGold: 0, desc: 'Заробити 500K яєць' }
+    ];
+    const random = quests.sort(() => Math.random() - 0.5).slice(0, 3);
+    state.dailyQuests = { date: new Date().toISOString().split('T')[0], quests: random };
+  }
+
+  function renderQuests() {
+    const panel = document.getElementById('questsPanel');
+    if (!state.dailyQuests.date || state.dailyQuests.date !== new Date().toISOString().split('T')[0]) {
+      generateDailyQuests();
+    }
+    const quests = state.dailyQuests.quests;
+    panel.innerHTML = '';
+    quests.forEach((q, index) => {
+      let progress = 0;
+      if (q.type === 'buy') progress = Object.values(state.upgrades).reduce((a,b) => a+b, 0);
+      else if (q.type === 'clicks') progress = state.totalClicks;
+      else if (q.type === 'earn') progress = state.totalProduced;
+      q.progress = Math.min(progress, q.target);
+      const pct = (q.progress / q.target) * 100;
+      const div = document.createElement('div'); div.className = 'quest-item';
+      div.innerHTML = `<div style="flex:2;">${q.desc}</div>
+        <div style="flex:3;"><div class="quest-progress"><div class="quest-fill" style="width:${pct}%"></div></div></div>
+        <div style="flex:1;">${q.progress}/${q.target}</div>`;
       panel.appendChild(div);
+    });
+    // Перевірка завершених
+    quests.forEach((q, index) => {
+      if (q.progress >= q.target && !q.claimed) {
+        q.claimed = true;
+        state.eggs += q.rewardEggs;
+        if (q.rewardGold) state.goldEggs += q.rewardGold;
+        showNotification('🎯 Завдання виконано! +' + formatNumber(q.rewardEggs) + ' 🥚');
+        updateUI();
+      }
     });
   }
 
@@ -519,9 +547,8 @@
     const bar = document.getElementById('boostBar');
     const fill = document.getElementById('boostFill');
     const boostBtn = document.getElementById('activateBoost');
-    const boostCostSpan = document.getElementById('boostCost');
     const boostCost = 5000 * (state.boostUntil && Date.now() < state.boostUntil ? 2 : 1);
-    boostCostSpan.textContent = formatNumber(boostCost);
+    document.getElementById('boostCost').textContent = formatNumber(boostCost);
     if (state.boostUntil && Date.now() < state.boostUntil) {
       bar.style.display = 'block';
       const remaining = state.boostUntil - Date.now();
@@ -536,28 +563,27 @@
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('dailyBtn').style.display = (state.lastDailyClaim !== today) ? 'block' : 'none';
 
+    renderFastUpgrades();
     renderUpgrades();
     renderShop();
     renderPrestige();
     renderAchievements();
+    renderQuests();
   }
 
-  // Подія
+  // Подія "Яєчний дощ"
   function randomEvent() {
     if (document.querySelector('.event-btn')) return;
-    const eventBtn = document.createElement('button');
-    eventBtn.className = 'event-btn';
-    eventBtn.textContent = '🥚🌧️ Яєчний дощ!';
-    eventBtn.addEventListener('click', () => {
+    const btn = document.createElement('button'); btn.className = 'event-btn';
+    btn.textContent = '🥚🌧️ Яєчний дощ!';
+    btn.addEventListener('click', () => {
       const bonus = calculateEPS() * 30;
-      state.eggs += bonus;
-      state.totalProduced += bonus;
-      showNotification('🌧️ +' + formatNumber(bonus) + ' яєць!');
-      eventBtn.remove();
-      updateUI();
+      state.eggs += bonus; state.totalProduced += bonus;
+      showNotification('🌧️ +' + formatNumber(bonus));
+      btn.remove(); updateUI();
     });
-    document.body.appendChild(eventBtn);
-    setTimeout(() => { if (eventBtn.parentNode) eventBtn.remove(); }, 10000);
+    document.body.appendChild(btn);
+    setTimeout(() => { if (btn.parentNode) btn.remove(); }, 10000);
   }
 
   // Збереження
@@ -570,10 +596,11 @@
           parsed.prestigeMultiplier = parsed.goldEggs;
           parsed.goldEggs = 0;
         }
-        // Нормалізація структури
         state = Object.assign(JSON.parse(JSON.stringify(defaultState)), parsed);
         if (!state.prestigeShop) state.prestigeShop = { startingEggs:0, clickPower:0, costReduction:0 };
-      } catch(e) { /* залишаємо дефолтний стан */ }
+        if (!state.dailyQuests) state.dailyQuests = { date: null, quests: [] };
+        if (state.vibroEnabled === undefined) state.vibroEnabled = true;
+      } catch(e) {}
     }
   }
 
@@ -582,75 +609,73 @@
     localStorage.setItem('eggClickerSave_v2', JSON.stringify(state));
   }
 
+  // Туторіал (простий)
+  if (state.totalClicks === 0 && state.eggs === 0) {
+    setTimeout(() => showNotification('👋 Ласкаво просимо! Тисни на яйце, щоб заробити яйця.'), 500);
+  }
+
   // Старт
   loadGame();
   const gained = applyOfflineEarnings();
-  if (gained > 0) showNotification('⏳ Ви заробили ' + formatNumber(gained) + ' яєць за офлайн!');
+  if (gained > 0) showNotification('⏳ Офлайн-дохід: +' + formatNumber(gained) + ' 🥚 (за 12 год макс)');
   updateUI();
 
-  // Клік по яйцю
+  // Обробники
   document.getElementById('eggBtn').addEventListener('click', function(e) {
-    const rect = this.getBoundingClientRect();
     const add = getClickPower();
-    state.eggs += add;
-    state.totalProduced += add;
-    state.totalClicks++;
-    const floatDiv = document.createElement('div');
-    floatDiv.className = 'float-text';
+    state.eggs += add; state.totalProduced += add; state.totalClicks++;
+    const rect = this.getBoundingClientRect();
+    const floatDiv = document.createElement('div'); floatDiv.className = 'float-text';
     floatDiv.textContent = '+' + formatNumber(add);
     floatDiv.style.left = (e.clientX - rect.left) + 'px';
     floatDiv.style.top = (e.clientY - rect.top) + 'px';
     document.getElementById('floatContainer').appendChild(floatDiv);
-    setTimeout(() => { if (floatDiv.parentNode) floatDiv.remove(); }, 900);
+    setTimeout(() => floatDiv.remove(), 900);
+    vibrate();
     updateUI();
   });
 
-  // Автоклік та EPS
   setInterval(() => {
     let auto = state.upgrades['robot'] || 0;
     shopItems.forEach(item => { if (state.shopUpgrades[item.id] && item.effect === 'autoclick') auto += item.val; });
-    if (auto > 0) {
-      const add = getClickPower() * auto;
-      state.eggs += add;
-      state.totalProduced += add;
-      updateUI();
-    }
+    if (auto > 0) { state.eggs += getClickPower() * auto; state.totalProduced += getClickPower() * auto; updateUI(); }
   }, 1000);
 
   setInterval(() => {
     const eps = calculateEPS();
-    if (eps > 0) {
-      state.eggs += eps / 20;
-      state.totalProduced += eps / 20;
-      updateUI();
-    }
+    if (eps > 0) { state.eggs += eps/20; state.totalProduced += eps/20; updateUI(); }
   }, 50);
 
   document.getElementById('activateBoost').addEventListener('click', () => {
     const cost = 5000 * (state.boostUntil && Date.now() < state.boostUntil ? 2 : 1);
-    if (state.eggs >= cost) {
-      state.eggs -= cost;
-      state.boostUntil = Date.now() + 30000;
-      updateUI();
-      showNotification('⚡ Буст x2 на 30с!');
-    } else alert('Недостатньо яєць!');
+    if (state.eggs >= cost) { state.eggs -= cost; state.boostUntil = Date.now() + 30000; updateUI(); }
+    else alert('Недостатньо яєць!');
   });
 
   document.getElementById('dailyBtn').addEventListener('click', () => {
     const today = new Date().toISOString().split('T')[0];
     if (state.lastDailyClaim !== today) {
       const bonus = 50000 + Math.floor(Math.random() * 50000);
-      state.eggs += bonus;
-      state.totalProduced += bonus;
-      state.lastDailyClaim = today;
-      updateUI();
-      showNotification('🎁 Щоденний бонус: +' + formatNumber(bonus) + ' яєць!');
+      state.eggs += bonus; state.totalProduced += bonus; state.lastDailyClaim = today;
+      updateUI(); showNotification('🎁 Щоденний бонус: +' + formatNumber(bonus));
     }
   });
 
+  // Налаштування
+  const settingsPanel = document.getElementById('settingsPanel');
+  const vibroToggle = document.getElementById('vibroToggle');
+  vibroToggle.classList.toggle('active', state.vibroEnabled);
+  vibroToggle.addEventListener('click', () => {
+    state.vibroEnabled = !state.vibroEnabled;
+    vibroToggle.classList.toggle('active', state.vibroEnabled);
+    saveGame();
+  });
+  document.getElementById('settingsBtn').addEventListener('click', () => { settingsPanel.style.display = 'block'; });
+  document.getElementById('closeSettings').addEventListener('click', () => { settingsPanel.style.display = 'none'; });
+
   // Таби
   function switchTab(tab) {
-    ['upgrades','shop','prestige','achievements'].forEach(t => {
+    ['upgrades','shop','prestige','achievements','quests'].forEach(t => {
       document.getElementById(t+'Panel').style.display = (t === tab) ? 'block' : 'none';
       document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle('active', t === tab);
     });
@@ -659,40 +684,33 @@
   document.getElementById('tabShop').addEventListener('click', ()=> switchTab('shop'));
   document.getElementById('tabPrestige').addEventListener('click', ()=> switchTab('prestige'));
   document.getElementById('tabAchievements').addEventListener('click', ()=> switchTab('achievements'));
+  document.getElementById('tabQuests').addEventListener('click', ()=> switchTab('quests'));
 
-  // Збереження та імпорт
-  document.getElementById('saveBtn').addEventListener('click', () => { saveGame(); showNotification('💾 Збережено!'); });
-  document.getElementById('exportBtn').addEventListener('click', () => {
+  // Експорт/Імпорт
+  document.getElementById('saveBtn').addEventListener('click', ()=>{ saveGame(); showNotification('💾 Збережено!'); });
+  document.getElementById('exportBtn').addEventListener('click', ()=>{
     saveGame();
     const json = JSON.stringify(state);
     document.getElementById('exportImport').style.display = 'flex';
     document.getElementById('saveString').value = json;
-    if (navigator.clipboard) navigator.clipboard.writeText(json).then(() => showNotification('📋 Код скопійовано!'));
+    if (navigator.clipboard) navigator.clipboard.writeText(json).then(()=> showNotification('📋 Код скопійовано!'));
   });
-  document.getElementById('importBtn').addEventListener('click', () => {
+  document.getElementById('importBtn').addEventListener('click', ()=>{
     const str = document.getElementById('saveString').value.trim();
     if (str) {
       try {
         const data = JSON.parse(str);
         if (data.eggs !== undefined) {
           state = Object.assign(JSON.parse(JSON.stringify(defaultState)), data);
-          if (!state.prestigeShop) state.prestigeShop = { startingEggs:0, clickPower:0, costReduction:0 };
-          saveGame();
-          updateUI();
-          showNotification('📥 Імпортовано!');
-        } else throw new Error();
+          saveGame(); updateUI(); showNotification('📥 Імпортовано!');
+        }
       } catch(e) { alert('Некоректний код!'); }
     }
   });
-  document.getElementById('resetBtn').addEventListener('click', () => {
-    if (confirm('Видалити ВСЕ?')) {
-      state = JSON.parse(JSON.stringify(defaultState));
-      saveGame();
-      updateUI();
-    }
+  document.getElementById('resetBtn').addEventListener('click', ()=>{
+    if (confirm('Видалити ВСЕ?')) { state = JSON.parse(JSON.stringify(defaultState)); saveGame(); updateUI(); }
   });
 
-  // Випадкові події та автосейв
   setInterval(randomEvent, 180000 + Math.floor(Math.random() * 180000));
   setInterval(saveGame, 10000);
   window.addEventListener('beforeunload', saveGame);
