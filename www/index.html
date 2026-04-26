@@ -180,7 +180,7 @@
 </head>
 <body>
 <div id="app">
-  <h1 id="eggTitle">🥚 Яєчний Інкубатор</h1>
+  <h1>🥚 Яєчний Інкубатор</h1>
   <div class="version">v2.2 Lite · Безпечна версія</div>
   <div class="stats">
     <div class="stat"><span class="stat-value" id="eggDisplay">0</span>🥚</div>
@@ -221,260 +221,237 @@
 </div>
 
 <script>
-  // Без Capacitor — тільки чистий JavaScript та localStorage
-  (function() {
-    // ---------- СТАН ГРИ ----------
-    const defaultState = {
-      eggs: 0,
-      goldEggs: 0,
-      prestigeMultiplier: 0,
-      upgrades: {},
-      shopUpgrades: {},
-      totalProduced: 0,
-      totalClicks: 0,
-      lastSaveTime: null,
-      achievements: [],
-      boostUntil: null,
-      prestigeShop: { startingEggs: 0, clickPower: 0, costReduction: 0 },
-      lastDailyClaim: null
-    };
+(function() {
+  // ---------- СТАН ГРИ ----------
+  const defaultState = {
+    eggs: 0,
+    goldEggs: 0,
+    prestigeMultiplier: 0,
+    upgrades: {},
+    shopUpgrades: {},
+    totalProduced: 0,
+    totalClicks: 0,
+    lastSaveTime: null,
+    achievements: [],
+    boostUntil: null,
+    prestigeShop: { startingEggs: 0, clickPower: 0, costReduction: 0 },
+    lastDailyClaim: null
+  };
 
-    let state = JSON.parse(JSON.stringify(defaultState));
+  let state = JSON.parse(JSON.stringify(defaultState));
 
-    const upgradesData = [
-      { id: 'hand',      name: 'Рука',        desc: '+1 до кліку',              baseCost: 10,    effect: 'click', value: 1 },
-      { id: 'chicken',   name: 'Курка',       desc: '+0.5 яєць/с',              baseCost: 50,    effect: 'eps', value: 0.5 },
-      { id: 'nest',      name: 'Гніздо',      desc: '+2 яєць/с',                baseCost: 200,   effect: 'eps', value: 2 },
-      { id: 'farm',      name: 'Ферма',       desc: '+10 яєць/с',               baseCost: 1000,  effect: 'eps', value: 10 },
-      { id: 'factory',   name: 'Фабрика',     desc: '+50 яєць/с',               baseCost: 5000,  effect: 'eps', value: 50 },
-      { id: 'lab',       name: 'Лабораторія', desc: '+250 яєць/с',              baseCost: 25000, effect: 'eps', value: 250 },
-      { id: 'quantum',   name: 'Квантовий інкубатор', desc: '+1200 яєць/с',     baseCost: 100000,effect: 'eps', value: 1200 },
-      { id: 'robot',     name: 'Робо-рука',   desc: 'Автоклік 1 раз/с',         baseCost: 500,   effect: 'autoclick', value: 1 },
-      { id: 'goldChick', name: 'Золота курка',desc: '10% шанс подвійного кліку',baseCost: 2000,  effect: 'crit', value: 0.1 },
-      { id: 'portal',    name: 'Яйце-портал', desc: '+5% до EPS за рівень',     baseCost: 10000, effect: 'epsPercent', value: 0.05 },
-      { id: 'star',      name: 'Зоряне яйце', desc: '+5000 яєць/с',             baseCost: 500000,effect: 'eps', value: 5000 }
-    ];
+  const upgradesData = [
+    { id: 'hand',      name: 'Рука',        desc: '+1 до кліку',              baseCost: 10,    effect: 'click', value: 1 },
+    { id: 'chicken',   name: 'Курка',       desc: '+0.5 яєць/с',              baseCost: 50,    effect: 'eps', value: 0.5 },
+    { id: 'nest',      name: 'Гніздо',      desc: '+2 яєць/с',                baseCost: 200,   effect: 'eps', value: 2 },
+    { id: 'farm',      name: 'Ферма',       desc: '+10 яєць/с',               baseCost: 1000,  effect: 'eps', value: 10 },
+    { id: 'factory',   name: 'Фабрика',     desc: '+50 яєць/с',               baseCost: 5000,  effect: 'eps', value: 50 },
+    { id: 'lab',       name: 'Лабораторія', desc: '+250 яєць/с',              baseCost: 25000, effect: 'eps', value: 250 },
+    { id: 'quantum',   name: 'Квантовий інкубатор', desc: '+1200 яєць/с',     baseCost: 100000,effect: 'eps', value: 1200 },
+    { id: 'robot',     name: 'Робо-рука',   desc: 'Автоклік 1 раз/с',         baseCost: 500,   effect: 'autoclick', value: 1 },
+    { id: 'goldChick', name: 'Золота курка',desc: '10% шанс подвійного кліку',baseCost: 2000,  effect: 'crit', value: 0.1 },
+    { id: 'portal',    name: 'Яйце-портал', desc: '+5% до EPS за рівень',     baseCost: 10000, effect: 'epsPercent', value: 0.05 },
+    { id: 'star',      name: 'Зоряне яйце', desc: '+5000 яєць/с',             baseCost: 500000,effect: 'eps', value: 5000 }
+  ];
 
-    const shopItems = [
-      { id: 'goldenNest',   name: 'Золоте гніздо',      desc: 'Миттєво +50% до EPS',            cost: 500000,   effect: 'epsMult', val: 1.5 },
-      { id: 'teleport',     name: 'Телепорт яєць',       desc: 'Автоклік +10/с',                 cost: 2000000,  effect: 'autoclick', val: 10 },
-      { id: 'eggTower',     name: 'Яєчна вежа',          desc: '+10 до сили кліку',              cost: 1000000,  effect: 'click', val: 10 },
-      { id: 'incubator3k',  name: 'Інкубатор 3000',      desc: '+25 000 яєць/с',                 cost: 15000000, effect: 'eps', val: 25000 },
-      { id: 'quantumLink',  name: 'Квантовий зв\'язок',  desc: 'Множник EPS x1.2',              cost: 8000000,  effect: 'epsMult', val: 1.2 },
-      { id: 'dragonEgg',    name: 'Яйце дракона',        desc: 'Крит. шанс +20%',               cost: 12000000, effect: 'critAdd', val: 0.2 },
-      { id: 'cosmicPortal', name: 'Міжвимірний портал',  desc: 'Автоклік +100/с',               cost: 30000000, effect: 'autoclick', val: 100 }
-    ];
+  const shopItems = [
+    { id: 'goldenNest',   name: 'Золоте гніздо',      desc: 'Миттєво +50% до EPS',            cost: 500000,   effect: 'epsMult', val: 1.5 },
+    { id: 'teleport',     name: 'Телепорт яєць',       desc: 'Автоклік +10/с',                 cost: 2000000,  effect: 'autoclick', val: 10 },
+    { id: 'eggTower',     name: 'Яєчна вежа',          desc: '+10 до сили кліку',              cost: 1000000,  effect: 'click', val: 10 },
+    { id: 'incubator3k',  name: 'Інкубатор 3000',      desc: '+25 000 яєць/с',                 cost: 15000000, effect: 'eps', val: 25000 },
+    { id: 'quantumLink',  name: 'Квантовий зв\'язок',  desc: 'Множник EPS x1.2',              cost: 8000000,  effect: 'epsMult', val: 1.2 },
+    { id: 'dragonEgg',    name: 'Яйце дракона',        desc: 'Крит. шанс +20%',               cost: 12000000, effect: 'critAdd', val: 0.2 },
+    { id: 'cosmicPortal', name: 'Міжвимірний портал',  desc: 'Автоклік +100/с',               cost: 30000000, effect: 'autoclick', val: 100 }
+  ];
 
-    const achievementsList = [
-      { id: 'first100', name: 'Перша сотня', desc: '100 яєць', check: s => s.eggs >= 100 },
-      { id: 'clicker', name: 'Клікер', desc: '50 кліків', check: s => s.totalClicks >= 50 },
-      { id: 'chickenLord', name: 'Курячий лорд', desc: '5 курок', check: s => (s.upgrades['chicken']||0) >= 5 },
-      { id: 'golden1', name: 'Перше золото', desc: 'Здобути золоте яйце', check: s => s.goldEggs + s.prestigeMultiplier >= 1 },
-      { id: 'rich', name: 'Мільйонер', desc: '1 000 000 яєць', check: s => s.eggs >= 1_000_000 },
-      { id: 'robotArmy', name: 'Армія роботів', desc: '10 робо-рук', check: s => (s.upgrades['robot']||0) >= 10 },
-      { id: 'speed', name: 'Швидкість', desc: 'EPS > 10 000', check: s => calculateEPS() > 10000 },
-    ];
+  const achievementsList = [
+    { id: 'first100', name: 'Перша сотня', desc: '100 яєць', check: s => s.eggs >= 100 },
+    { id: 'clicker', name: 'Клікер', desc: '50 кліків', check: s => s.totalClicks >= 50 },
+    { id: 'chickenLord', name: 'Курячий лорд', desc: '5 курок', check: s => (s.upgrades['chicken']||0) >= 5 },
+    { id: 'golden1', name: 'Перше золото', desc: 'Здобути золоте яйце', check: s => s.goldEggs + s.prestigeMultiplier >= 1 },
+    { id: 'rich', name: 'Мільйонер', desc: '1 000 000 яєць', check: s => s.eggs >= 1_000_000 },
+    { id: 'robotArmy', name: 'Армія роботів', desc: '10 робо-рук', check: s => (s.upgrades['robot']||0) >= 10 },
+    { id: 'speed', name: 'Швидкість', desc: 'EPS > 10 000', check: s => calculateEPS() > 10000 },
+  ];
 
-    function getUpgradeCost(id) {
-      const u = upgradesData.find(x => x.id === id);
-      const owned = state.upgrades[id] || 0;
-      let base = u.baseCost;
-      if (state.prestigeShop.costReduction) {
-        base *= (1 - state.prestigeShop.costReduction / 100);
-      }
-      return Math.floor(base * Math.pow(1.15, owned));
+  function getUpgradeCost(id) {
+    const u = upgradesData.find(x => x.id === id);
+    if (!u) return Infinity;
+    const owned = state.upgrades[id] || 0;
+    let base = u.baseCost;
+    if (state.prestigeShop && state.prestigeShop.costReduction) {
+      base *= (1 - state.prestigeShop.costReduction / 100);
     }
+    return Math.floor(base * Math.pow(1.15, owned));
+  }
 
-    function calculateEPS() {
-      let eps = 0;
-      upgradesData.forEach(u => {
-        if (u.effect === 'eps') eps += u.value * (state.upgrades[u.id] || 0);
-        if (u.effect === 'epsPercent') eps *= (1 + u.value * (state.upgrades[u.id] || 0));
-      });
-      shopItems.forEach(item => {
-        if (state.shopUpgrades[item.id]) {
-          if (item.effect === 'eps') eps += item.val;
-          if (item.effect === 'epsMult') eps *= item.val;
+  function calculateEPS() {
+    let eps = 0;
+    upgradesData.forEach(u => {
+      if (u.effect === 'eps') eps += u.value * (state.upgrades[u.id] || 0);
+      if (u.effect === 'epsPercent') eps *= (1 + u.value * (state.upgrades[u.id] || 0));
+    });
+    shopItems.forEach(item => {
+      if (state.shopUpgrades[item.id]) {
+        if (item.effect === 'eps') eps += item.val;
+        if (item.effect === 'epsMult') eps *= item.val;
+      }
+    });
+    const mult = 1 + state.prestigeMultiplier * 0.10;
+    eps *= mult;
+    if (state.boostUntil && Date.now() < state.boostUntil) eps *= 2;
+    return eps;
+  }
+
+  function getClickPower() {
+    let base = 1 + (state.upgrades['hand'] || 0) + (state.prestigeShop.clickPower || 0);
+    shopItems.forEach(item => {
+      if (state.shopUpgrades[item.id] && item.effect === 'click') base += item.val;
+    });
+    let critChance = Math.min(1, (state.upgrades['goldChick'] || 0) * 0.1);
+    shopItems.forEach(item => {
+      if (state.shopUpgrades[item.id] && item.effect === 'critAdd') critChance += item.val;
+    });
+    if (Math.random() < critChance) base *= 2;
+    const mult = 1 + state.prestigeMultiplier * 0.10;
+    base *= mult;
+    if (state.boostUntil && Date.now() < state.boostUntil) base *= 2;
+    return base;
+  }
+
+  function formatNumber(num) {
+    if (num < 1000) return Math.floor(num).toString();
+    const suffixes = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi'];
+    let tier = 0, val = num;
+    while (val >= 1000 && tier < suffixes.length-1) { val /= 1000; tier++; }
+    return val.toFixed(1) + suffixes[tier];
+  }
+
+  function applyOfflineEarnings() {
+    if (!state.lastSaveTime) return 0;
+    try {
+      const now = Date.now();
+      const last = new Date(state.lastSaveTime).getTime();
+      const diffSeconds = Math.min((now - last) / 1000, 86400);
+      if (diffSeconds < 10) return 0;
+      const eps = calculateEPS();
+      const gained = eps * diffSeconds;
+      state.eggs += gained;
+      state.totalProduced += gained;
+      return gained;
+    } catch(e) { return 0; }
+  }
+
+  function showNotification(text) {
+    const notif = document.createElement('div');
+    notif.className = 'notification';
+    notif.textContent = text;
+    document.body.appendChild(notif);
+    setTimeout(() => { if (notif.parentNode) notif.remove(); }, 3000);
+  }
+
+  function updateEggAppearance() {
+    const emoji = document.getElementById('eggEmoji');
+    if (!emoji) return;
+    const total = state.totalProduced + state.eggs;
+    if (total > 100_000_000) emoji.textContent = '🌌';
+    else if (total > 10_000_000) emoji.textContent = '🐉';
+    else if (total > 1_000_000) emoji.textContent = '💎';
+    else if (total > 100_000) emoji.textContent = '🥚🌟';
+    else if (total > 10_000) emoji.textContent = '🥚✨';
+    else emoji.textContent = '🥚';
+  }
+
+  // Рендеринг з додаванням обробників через addEventListener
+  function renderUpgrades() {
+    const panel = document.getElementById('upgradesPanel');
+    panel.innerHTML = '';
+    upgradesData.forEach(u => {
+      const owned = state.upgrades[u.id] || 0;
+      const cost = getUpgradeCost(u.id);
+      const canBuy = state.eggs >= cost;
+
+      const div = document.createElement('div');
+      div.className = 'upgrade';
+
+      const infoDiv = document.createElement('div');
+      infoDiv.className = 'upgrade-info';
+      infoDiv.innerHTML = `<div class="upgrade-name">${u.name} (${owned})</div><div class="upgrade-desc">${u.desc}</div>`;
+
+      const btn = document.createElement('button');
+      btn.textContent = formatNumber(cost) + ' 🥚';
+      btn.disabled = !canBuy;
+      btn.addEventListener('click', () => {
+        if (state.eggs >= getUpgradeCost(u.id)) {
+          state.eggs -= getUpgradeCost(u.id);
+          state.upgrades[u.id] = (state.upgrades[u.id] || 0) + 1;
+          updateUI();
         }
       });
-      const mult = 1 + state.prestigeMultiplier * 0.10;
-      eps *= mult;
-      if (state.boostUntil && Date.now() < state.boostUntil) eps *= 2;
-      return eps;
-    }
 
-    function getClickPower() {
-      let base = 1 + (state.upgrades['hand'] || 0) + state.prestigeShop.clickPower;
-      shopItems.forEach(item => {
-        if (state.shopUpgrades[item.id] && item.effect === 'click') base += item.val;
+      div.appendChild(infoDiv);
+      div.appendChild(btn);
+      panel.appendChild(div);
+    });
+  }
+
+  function renderShop() {
+    const panel = document.getElementById('shopPanel');
+    panel.innerHTML = '';
+    shopItems.forEach(item => {
+      const bought = state.shopUpgrades[item.id] === true;
+      const canBuy = !bought && state.eggs >= item.cost;
+
+      const div = document.createElement('div');
+      div.className = 'shop-item';
+
+      const infoDiv = document.createElement('div');
+      infoDiv.className = 'upgrade-info';
+      infoDiv.innerHTML = `<div class="shop-name">${item.name}</div><div class="shop-desc">${item.desc}</div>`;
+
+      const btn = document.createElement('button');
+      btn.textContent = bought ? '✅' : formatNumber(item.cost) + ' 🥚';
+      btn.disabled = !canBuy;
+      btn.addEventListener('click', () => {
+        if (!state.shopUpgrades[item.id] && state.eggs >= item.cost) {
+          state.eggs -= item.cost;
+          state.shopUpgrades[item.id] = true;
+          updateUI();
+          showNotification('🛍️ Куплено: ' + item.name + '!');
+        }
       });
-      let critChance = Math.min(1, (state.upgrades['goldChick'] || 0) * 0.1);
-      shopItems.forEach(item => {
-        if (state.shopUpgrades[item.id] && item.effect === 'critAdd') critChance += item.val;
-      });
-      if (Math.random() < critChance) base *= 2;
-      const mult = 1 + state.prestigeMultiplier * 0.10;
-      base *= mult;
-      if (state.boostUntil && Date.now() < state.boostUntil) base *= 2;
-      return base;
-    }
 
-    function formatNumber(num) {
-      if (num < 1000) return Math.floor(num).toString();
-      const suffixes = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi'];
-      let tier = 0, val = num;
-      while (val >= 1000 && tier < suffixes.length-1) { val /= 1000; tier++; }
-      return val.toFixed(1) + suffixes[tier];
-    }
+      div.appendChild(infoDiv);
+      div.appendChild(btn);
+      panel.appendChild(div);
+    });
+  }
 
-    function applyOfflineEarnings() {
-      if (!state.lastSaveTime) return 0;
-      try {
-        const now = Date.now();
-        const last = new Date(state.lastSaveTime).getTime();
-        const diffSeconds = Math.min((now - last) / 1000, 86400);
-        if (diffSeconds < 10) return 0;
-        const eps = calculateEPS(); // використовує поточний стан
-        const gained = eps * diffSeconds;
-        state.eggs += gained;
-        state.totalProduced += gained;
-        return gained;
-      } catch(e) { return 0; }
-    }
+  function renderPrestige() {
+    const panel = document.getElementById('prestigePanel');
+    panel.innerHTML = '';
 
-    function showNotification(text) {
-      const notif = document.createElement('div');
-      notif.className = 'notification';
-      notif.textContent = text;
-      document.body.appendChild(notif);
-      setTimeout(() => notif.remove(), 3000);
-    }
+    const headerDiv = document.createElement('div');
+    headerDiv.className = 'prestige-info';
+    headerDiv.style.justifyContent = 'center';
+    headerDiv.style.textAlign = 'center';
+    headerDiv.style.marginBottom = '10px';
+    headerDiv.innerHTML = '<strong>🌟 Престиж</strong><br><small>Скидає звичайні яйця, покращення та магазин</small>';
+    panel.appendChild(headerDiv);
 
-    function updateEggAppearance() {
-      const emoji = document.getElementById('eggEmoji');
-      const total = state.totalProduced + state.eggs;
-      if (total > 100_000_000) emoji.textContent = '🌌';
-      else if (total > 10_000_000) emoji.textContent = '🐉';
-      else if (total > 1_000_000) emoji.textContent = '💎';
-      else if (total > 100_000) emoji.textContent = '🥚🌟';
-      else if (total > 10_000) emoji.textContent = '🥚✨';
-      else emoji.textContent = '🥚';
-    }
+    const nextGoldCost = 1_000_000 * (state.goldEggs + state.prestigeMultiplier + 1);
+    const pCost = document.createElement('p');
+    pCost.innerHTML = 'Наступне коштує: <strong>' + formatNumber(nextGoldCost) + ' 🥚</strong>';
+    panel.appendChild(pCost);
 
-    function updateUI() {
-      document.getElementById('eggDisplay').textContent = formatNumber(state.eggs);
-      document.getElementById('epsDisplay').textContent = formatNumber(calculateEPS());
-      document.getElementById('goldDisplay').textContent = state.goldEggs + state.prestigeMultiplier;
-      updateEggAppearance();
-
-      const bar = document.getElementById('boostBar');
-      const fill = document.getElementById('boostFill');
-      const boostBtn = document.getElementById('activateBoost');
-      const boostCostSpan = document.getElementById('boostCost');
-      const boostCost = 5000 * (state.boostUntil && Date.now() < state.boostUntil ? 2 : 1);
-      boostCostSpan.textContent = formatNumber(boostCost);
-      if (state.boostUntil && Date.now() < state.boostUntil) {
-        bar.style.display = 'block';
-        const remaining = state.boostUntil - Date.now();
-        fill.style.width = Math.max(0, (remaining / 30000) * 100) + '%';
-        boostBtn.textContent = '⚡ Активний (' + Math.ceil(remaining/1000) + 'с)';
-      } else {
-        bar.style.display = 'none';
-        if (state.boostUntil && Date.now() >= state.boostUntil) state.boostUntil = null;
-        boostBtn.innerHTML = '⚡ Буст x2 (<span id="boostCost">' + formatNumber(boostCost) + '</span>🥚)';
-      }
-
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('dailyBtn').style.display = (state.lastDailyClaim !== today) ? 'block' : 'none';
-
-      renderUpgrades();
-      renderShop();
-      renderPrestige();
-      renderAchievements();
-    }
-
-    function renderUpgrades() {
-      const panel = document.getElementById('upgradesPanel');
-      panel.innerHTML = '';
-      upgradesData.forEach(u => {
-        const owned = state.upgrades[u.id] || 0;
-        const cost = getUpgradeCost(u.id);
-        const canBuy = state.eggs >= cost;
-        panel.innerHTML += `<div class="upgrade">
-          <div class="upgrade-info"><div class="upgrade-name">${u.name} (${owned})</div><div class="upgrade-desc">${u.desc}</div></div>
-          <button onclick="window.buyUpgrade('${u.id}')" ${!canBuy ? 'disabled' : ''}>${formatNumber(cost)} 🥚</button>
-        </div>`;
-      });
-    }
-
-    function renderShop() {
-      const panel = document.getElementById('shopPanel');
-      panel.innerHTML = '';
-      shopItems.forEach(item => {
-        const bought = state.shopUpgrades[item.id] === true;
-        const canBuy = !bought && state.eggs >= item.cost;
-        panel.innerHTML += `<div class="shop-item">
-          <div class="upgrade-info"><div class="shop-name">${item.name}</div><div class="shop-desc">${item.desc}</div></div>
-          <button onclick="window.buyShop('${item.id}')" ${!canBuy ? 'disabled' : ''}>${bought ? '✅' : formatNumber(item.cost) + ' 🥚'}</button>
-        </div>`;
-      });
-    }
-
-    function renderPrestige() {
-      const panel = document.getElementById('prestigePanel');
-      const nextGoldCost = 1_000_000 * (state.goldEggs + state.prestigeMultiplier + 1);
-      const canPrestige = state.eggs >= nextGoldCost;
-      panel.innerHTML = `
-        <div class="prestige-info" style="justify-content:center; text-align:center; margin-bottom:10px;">
-          <strong>🌟 Престиж</strong><br><small>Скидає звичайні яйця, покращення та магазин</small>
-        </div>
-        <p>Наступне коштує: <strong>${formatNumber(nextGoldCost)} 🥚</strong></p>
-        <button class="gold-btn" onclick="window.performPrestige()" ${!canPrestige ? 'disabled' : ''}>🌟 Здобути Золоте!</button>
-        <hr style="margin:15px 0; border-color:#fff2;">
-        <h3>🛒 Магазин престижу</h3>
-        <div class="prestige-item"><div class="prestige-info"><strong>Глобальний множник</strong><br><small>+${(state.prestigeMultiplier*10).toFixed(0)}%</small></div><button onclick="window.buyPrestigeUpgrade('multiplier')" ${state.goldEggs<1?'disabled':''}>1 🥇</button></div>
-        <div class="prestige-item"><div class="prestige-info"><strong>Стартові яйця</strong><br><small>+100 після престижу (рів.${state.prestigeShop.startingEggs})</small></div><button onclick="window.buyPrestigeUpgrade('startingEggs')" ${state.goldEggs<1?'disabled':''}>1 🥇</button></div>
-        <div class="prestige-item"><div class="prestige-info"><strong>Сила кліку</strong><br><small>+1 (рів.${state.prestigeShop.clickPower})</small></div><button onclick="window.buyPrestigeUpgrade('clickPower')" ${state.goldEggs<2?'disabled':''}>2 🥇</button></div>
-        <div class="prestige-item"><div class="prestige-info"><strong>Знижка</strong><br><small>-5% (рів.${state.prestigeShop.costReduction}%)</small></div><button onclick="window.buyPrestigeUpgrade('costReduction')" ${state.goldEggs<3?'disabled':''}>3 🥇</button></div>
-      `;
-    }
-
-    function renderAchievements() {
-      const panel = document.getElementById('achievementsPanel');
-      panel.innerHTML = '';
-      achievementsList.forEach(a => {
-        const earned = state.achievements.includes(a.id);
-        panel.innerHTML += `<div class="achievement" style="opacity:${earned ? '1' : '0.4'}">
-          <div>🏆 <strong>${a.name}</strong><br><small>${a.desc}</small></div><span>${earned ? '✅' : '🔒'}</span>
-        </div>`;
-      });
-    }
-
-    // Глобальні функції
-    window.buyUpgrade = function(id) {
-      const cost = getUpgradeCost(id);
-      if (state.eggs >= cost) { state.eggs -= cost; state.upgrades[id] = (state.upgrades[id]||0)+1; updateUI(); }
-    };
-    window.buyShop = function(id) {
-      const item = shopItems.find(x => x.id === id);
-      if (item && !state.shopUpgrades[id] && state.eggs >= item.cost) {
-        state.eggs -= item.cost;
-        state.shopUpgrades[id] = true;
-        updateUI();
-        showNotification('🛍️ Куплено: ' + item.name + '!');
-      }
-    };
-    window.buyPrestigeUpgrade = function(type) {
-      if (type === 'multiplier' && state.goldEggs >= 1) { state.goldEggs--; state.prestigeMultiplier++; }
-      else if (type === 'startingEggs' && state.goldEggs >= 1) { state.goldEggs--; state.prestigeShop.startingEggs++; }
-      else if (type === 'clickPower' && state.goldEggs >= 2) { state.goldEggs -= 2; state.prestigeShop.clickPower++; }
-      else if (type === 'costReduction' && state.goldEggs >= 3) { state.goldEggs -= 3; state.prestigeShop.costReduction += 5; }
-      updateUI();
-    };
-    window.performPrestige = function() {
+    const prestigeBtn = document.createElement('button');
+    prestigeBtn.className = 'gold-btn';
+    prestigeBtn.textContent = '🌟 Здобути Золоте!';
+    prestigeBtn.disabled = state.eggs < nextGoldCost;
+    prestigeBtn.addEventListener('click', () => {
       const cost = 1_000_000 * (state.goldEggs + state.prestigeMultiplier + 1);
       if (state.eggs >= cost) {
-        state.eggs = state.prestigeShop.startingEggs * 100;
+        state.eggs = (state.prestigeShop.startingEggs || 0) * 100;
         state.upgrades = {};
         state.shopUpgrades = {};
         state.goldEggs++;
@@ -482,151 +459,244 @@
         updateUI();
         showNotification('🌟 Отримано золоте яйце!');
       }
-    };
+    });
+    panel.appendChild(prestigeBtn);
 
-    // Подія
-    function randomEvent() {
-      if (document.querySelector('.event-btn')) return;
-      const eventBtn = document.createElement('button');
-      eventBtn.className = 'event-btn';
-      eventBtn.textContent = '🥚🌧️ Яєчний дощ!';
-      eventBtn.onclick = () => {
-        const bonus = calculateEPS() * 30;
-        state.eggs += bonus;
-        state.totalProduced += bonus;
-        showNotification('🌧️ +' + formatNumber(bonus) + ' яєць!');
-        eventBtn.remove();
-        updateUI();
-      };
-      document.body.appendChild(eventBtn);
-      setTimeout(() => { if (eventBtn.parentNode) eventBtn.remove(); }, 10000);
+    panel.appendChild(document.createElement('hr'));
+
+    const shopTitle = document.createElement('h3');
+    shopTitle.textContent = '🛒 Магазин престижу';
+    panel.appendChild(shopTitle);
+
+    function addPrestigeItem(title, desc, cost, callback) {
+      const itemDiv = document.createElement('div');
+      itemDiv.className = 'prestige-item';
+      const infoDiv = document.createElement('div');
+      infoDiv.className = 'prestige-info';
+      infoDiv.innerHTML = `<strong>${title}</strong><br><small>${desc}</small>`;
+      const btn = document.createElement('button');
+      btn.textContent = cost + ' 🥇';
+      btn.disabled = state.goldEggs < cost;
+      btn.addEventListener('click', callback);
+      itemDiv.appendChild(infoDiv);
+      itemDiv.appendChild(btn);
+      panel.appendChild(itemDiv);
     }
 
-    // Основна ініціалізація
-    function loadGame() {
-      const saved = localStorage.getItem('eggClickerSave_v2');
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          if (parsed.goldEggs !== undefined && parsed.prestigeMultiplier === undefined) {
-            parsed.prestigeMultiplier = parsed.goldEggs;
-            parsed.goldEggs = 0;
-          }
-          state = Object.assign(JSON.parse(JSON.stringify(defaultState)), parsed);
-        } catch(e) {}
-      }
+    addPrestigeItem('Глобальний множник', `+${(state.prestigeMultiplier*10).toFixed(0)}%`, 1, () => {
+      if (state.goldEggs >= 1) { state.goldEggs--; state.prestigeMultiplier++; updateUI(); }
+    });
+    addPrestigeItem('Стартові яйця', `+100 після престижу (рів.${state.prestigeShop.startingEggs})`, 1, () => {
+      if (state.goldEggs >= 1) { state.goldEggs--; state.prestigeShop.startingEggs++; updateUI(); }
+    });
+    addPrestigeItem('Сила кліку', `+1 (рів.${state.prestigeShop.clickPower})`, 2, () => {
+      if (state.goldEggs >= 2) { state.goldEggs -= 2; state.prestigeShop.clickPower++; updateUI(); }
+    });
+    addPrestigeItem('Знижка', `-5% (рів.${state.prestigeShop.costReduction}%)`, 3, () => {
+      if (state.goldEggs >= 3) { state.goldEggs -= 3; state.prestigeShop.costReduction += 5; updateUI(); }
+    });
+  }
+
+  function renderAchievements() {
+    const panel = document.getElementById('achievementsPanel');
+    panel.innerHTML = '';
+    achievementsList.forEach(a => {
+      const earned = state.achievements.includes(a.id);
+      const div = document.createElement('div');
+      div.className = 'achievement';
+      div.style.opacity = earned ? '1' : '0.4';
+      div.innerHTML = `<div>🏆 <strong>${a.name}</strong><br><small>${a.desc}</small></div><span>${earned ? '✅' : '🔒'}</span>`;
+      panel.appendChild(div);
+    });
+  }
+
+  function updateUI() {
+    document.getElementById('eggDisplay').textContent = formatNumber(state.eggs);
+    document.getElementById('epsDisplay').textContent = formatNumber(calculateEPS());
+    document.getElementById('goldDisplay').textContent = state.goldEggs + state.prestigeMultiplier;
+    updateEggAppearance();
+
+    const bar = document.getElementById('boostBar');
+    const fill = document.getElementById('boostFill');
+    const boostBtn = document.getElementById('activateBoost');
+    const boostCostSpan = document.getElementById('boostCost');
+    const boostCost = 5000 * (state.boostUntil && Date.now() < state.boostUntil ? 2 : 1);
+    boostCostSpan.textContent = formatNumber(boostCost);
+    if (state.boostUntil && Date.now() < state.boostUntil) {
+      bar.style.display = 'block';
+      const remaining = state.boostUntil - Date.now();
+      fill.style.width = Math.max(0, (remaining / 30000) * 100) + '%';
+      boostBtn.textContent = '⚡ Активний (' + Math.ceil(remaining/1000) + 'с)';
+    } else {
+      bar.style.display = 'none';
+      if (state.boostUntil && Date.now() >= state.boostUntil) state.boostUntil = null;
+      boostBtn.innerHTML = '⚡ Буст x2 (<span id="boostCost">' + formatNumber(boostCost) + '</span>🥚)';
     }
 
-    function saveGame() {
-      state.lastSaveTime = new Date().toISOString();
-      localStorage.setItem('eggClickerSave_v2', JSON.stringify(state));
-    }
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('dailyBtn').style.display = (state.lastDailyClaim !== today) ? 'block' : 'none';
 
-    // Старт
-    loadGame();
-    const gained = applyOfflineEarnings();
-    if (gained > 0) showNotification('⏳ Ви заробили ' + formatNumber(gained) + ' яєць за офлайн!');
-    updateUI();
+    renderUpgrades();
+    renderShop();
+    renderPrestige();
+    renderAchievements();
+  }
 
-    // Обробник кліку
-    document.getElementById('eggBtn').addEventListener('click', function(e) {
-      const rect = this.getBoundingClientRect();
-      const add = getClickPower();
-      state.eggs += add;
-      state.totalProduced += add;
-      state.totalClicks++;
-      const floatDiv = document.createElement('div');
-      floatDiv.className = 'float-text';
-      floatDiv.textContent = '+' + formatNumber(add);
-      floatDiv.style.left = (e.clientX - rect.left) + 'px';
-      floatDiv.style.top = (e.clientY - rect.top) + 'px';
-      document.getElementById('floatContainer').appendChild(floatDiv);
-      setTimeout(() => floatDiv.remove(), 900);
+  // Подія
+  function randomEvent() {
+    if (document.querySelector('.event-btn')) return;
+    const eventBtn = document.createElement('button');
+    eventBtn.className = 'event-btn';
+    eventBtn.textContent = '🥚🌧️ Яєчний дощ!';
+    eventBtn.addEventListener('click', () => {
+      const bonus = calculateEPS() * 30;
+      state.eggs += bonus;
+      state.totalProduced += bonus;
+      showNotification('🌧️ +' + formatNumber(bonus) + ' яєць!');
+      eventBtn.remove();
       updateUI();
     });
+    document.body.appendChild(eventBtn);
+    setTimeout(() => { if (eventBtn.parentNode) eventBtn.remove(); }, 10000);
+  }
 
-    // Автоклік + EPS
-    setInterval(() => {
-      let auto = state.upgrades['robot'] || 0;
-      shopItems.forEach(item => { if (state.shopUpgrades[item.id] && item.effect === 'autoclick') auto += item.val; });
-      if (auto > 0) {
-        state.eggs += getClickPower() * auto;
-        state.totalProduced += getClickPower() * auto;
-        updateUI();
-      }
-    }, 1000);
-
-    setInterval(() => {
-      const eps = calculateEPS();
-      if (eps > 0) {
-        state.eggs += eps / 20;
-        state.totalProduced += eps / 20;
-        updateUI();
-      }
-    }, 50);
-
-    document.getElementById('activateBoost').addEventListener('click', () => {
-      const cost = 5000 * (state.boostUntil && Date.now() < state.boostUntil ? 2 : 1);
-      if (state.eggs >= cost) {
-        state.eggs -= cost;
-        state.boostUntil = Date.now() + 30000;
-        updateUI();
-        showNotification('⚡ Буст x2 на 30с!');
-      } else alert('Недостатньо яєць!');
-    });
-
-    document.getElementById('dailyBtn').addEventListener('click', () => {
-      const today = new Date().toISOString().split('T')[0];
-      if (state.lastDailyClaim !== today) {
-        const bonus = 50000 + Math.floor(Math.random() * 50000);
-        state.eggs += bonus;
-        state.totalProduced += bonus;
-        state.lastDailyClaim = today;
-        updateUI();
-        showNotification('🎁 Щоденний бонус: +' + formatNumber(bonus) + ' яєць!');
-      }
-    });
-
-    // Таби
-    function switchTab(tab) {
-      ['upgrades','shop','prestige','achievements'].forEach(t => {
-        document.getElementById(t+'Panel').style.display = (t === tab) ? 'block' : 'none';
-        document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle('active', t === tab);
-      });
+  // Збереження
+  function loadGame() {
+    const saved = localStorage.getItem('eggClickerSave_v2');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.goldEggs !== undefined && parsed.prestigeMultiplier === undefined) {
+          parsed.prestigeMultiplier = parsed.goldEggs;
+          parsed.goldEggs = 0;
+        }
+        // Нормалізація структури
+        state = Object.assign(JSON.parse(JSON.stringify(defaultState)), parsed);
+        if (!state.prestigeShop) state.prestigeShop = { startingEggs:0, clickPower:0, costReduction:0 };
+      } catch(e) { /* залишаємо дефолтний стан */ }
     }
-    document.getElementById('tabUpgrades').addEventListener('click', ()=> switchTab('upgrades'));
-    document.getElementById('tabShop').addEventListener('click', ()=> switchTab('shop'));
-    document.getElementById('tabPrestige').addEventListener('click', ()=> switchTab('prestige'));
-    document.getElementById('tabAchievements').addEventListener('click', ()=> switchTab('achievements'));
+  }
 
-    // Кнопки збереження
-    document.getElementById('saveBtn').addEventListener('click', () => { saveGame(); showNotification('💾 Збережено!'); });
-    document.getElementById('exportBtn').addEventListener('click', () => {
+  function saveGame() {
+    state.lastSaveTime = new Date().toISOString();
+    localStorage.setItem('eggClickerSave_v2', JSON.stringify(state));
+  }
+
+  // Старт
+  loadGame();
+  const gained = applyOfflineEarnings();
+  if (gained > 0) showNotification('⏳ Ви заробили ' + formatNumber(gained) + ' яєць за офлайн!');
+  updateUI();
+
+  // Клік по яйцю
+  document.getElementById('eggBtn').addEventListener('click', function(e) {
+    const rect = this.getBoundingClientRect();
+    const add = getClickPower();
+    state.eggs += add;
+    state.totalProduced += add;
+    state.totalClicks++;
+    const floatDiv = document.createElement('div');
+    floatDiv.className = 'float-text';
+    floatDiv.textContent = '+' + formatNumber(add);
+    floatDiv.style.left = (e.clientX - rect.left) + 'px';
+    floatDiv.style.top = (e.clientY - rect.top) + 'px';
+    document.getElementById('floatContainer').appendChild(floatDiv);
+    setTimeout(() => { if (floatDiv.parentNode) floatDiv.remove(); }, 900);
+    updateUI();
+  });
+
+  // Автоклік та EPS
+  setInterval(() => {
+    let auto = state.upgrades['robot'] || 0;
+    shopItems.forEach(item => { if (state.shopUpgrades[item.id] && item.effect === 'autoclick') auto += item.val; });
+    if (auto > 0) {
+      const add = getClickPower() * auto;
+      state.eggs += add;
+      state.totalProduced += add;
+      updateUI();
+    }
+  }, 1000);
+
+  setInterval(() => {
+    const eps = calculateEPS();
+    if (eps > 0) {
+      state.eggs += eps / 20;
+      state.totalProduced += eps / 20;
+      updateUI();
+    }
+  }, 50);
+
+  document.getElementById('activateBoost').addEventListener('click', () => {
+    const cost = 5000 * (state.boostUntil && Date.now() < state.boostUntil ? 2 : 1);
+    if (state.eggs >= cost) {
+      state.eggs -= cost;
+      state.boostUntil = Date.now() + 30000;
+      updateUI();
+      showNotification('⚡ Буст x2 на 30с!');
+    } else alert('Недостатньо яєць!');
+  });
+
+  document.getElementById('dailyBtn').addEventListener('click', () => {
+    const today = new Date().toISOString().split('T')[0];
+    if (state.lastDailyClaim !== today) {
+      const bonus = 50000 + Math.floor(Math.random() * 50000);
+      state.eggs += bonus;
+      state.totalProduced += bonus;
+      state.lastDailyClaim = today;
+      updateUI();
+      showNotification('🎁 Щоденний бонус: +' + formatNumber(bonus) + ' яєць!');
+    }
+  });
+
+  // Таби
+  function switchTab(tab) {
+    ['upgrades','shop','prestige','achievements'].forEach(t => {
+      document.getElementById(t+'Panel').style.display = (t === tab) ? 'block' : 'none';
+      document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle('active', t === tab);
+    });
+  }
+  document.getElementById('tabUpgrades').addEventListener('click', ()=> switchTab('upgrades'));
+  document.getElementById('tabShop').addEventListener('click', ()=> switchTab('shop'));
+  document.getElementById('tabPrestige').addEventListener('click', ()=> switchTab('prestige'));
+  document.getElementById('tabAchievements').addEventListener('click', ()=> switchTab('achievements'));
+
+  // Збереження та імпорт
+  document.getElementById('saveBtn').addEventListener('click', () => { saveGame(); showNotification('💾 Збережено!'); });
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    saveGame();
+    const json = JSON.stringify(state);
+    document.getElementById('exportImport').style.display = 'flex';
+    document.getElementById('saveString').value = json;
+    if (navigator.clipboard) navigator.clipboard.writeText(json).then(() => showNotification('📋 Код скопійовано!'));
+  });
+  document.getElementById('importBtn').addEventListener('click', () => {
+    const str = document.getElementById('saveString').value.trim();
+    if (str) {
+      try {
+        const data = JSON.parse(str);
+        if (data.eggs !== undefined) {
+          state = Object.assign(JSON.parse(JSON.stringify(defaultState)), data);
+          if (!state.prestigeShop) state.prestigeShop = { startingEggs:0, clickPower:0, costReduction:0 };
+          saveGame();
+          updateUI();
+          showNotification('📥 Імпортовано!');
+        } else throw new Error();
+      } catch(e) { alert('Некоректний код!'); }
+    }
+  });
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    if (confirm('Видалити ВСЕ?')) {
+      state = JSON.parse(JSON.stringify(defaultState));
       saveGame();
-      const json = JSON.stringify(state);
-      document.getElementById('exportImport').style.display = 'flex';
-      document.getElementById('saveString').value = json;
-      if (navigator.clipboard) navigator.clipboard.writeText(json).then(() => showNotification('📋 Код скопійовано!'));
-    });
-    document.getElementById('importBtn').addEventListener('click', () => {
-      const str = document.getElementById('saveString').value.trim();
-      if (str) {
-        try {
-          const data = JSON.parse(str);
-          if (data.eggs !== undefined) { state = Object.assign(JSON.parse(JSON.stringify(defaultState)), data); saveGame(); updateUI(); showNotification('📥 Імпортовано!'); }
-          else throw new Error();
-        } catch(e) { alert('Некоректний код!'); }
-      }
-    });
-    document.getElementById('resetBtn').addEventListener('click', () => {
-      if (confirm('Видалити ВСЕ?')) { state = JSON.parse(JSON.stringify(defaultState)); saveGame(); updateUI(); }
-    });
+      updateUI();
+    }
+  });
 
-    // Випадкові події кожні 3-6 хв
-    setInterval(randomEvent, 180000 + Math.floor(Math.random() * 180000));
-    setInterval(saveGame, 10000);
-    window.addEventListener('beforeunload', saveGame);
-  })();
+  // Випадкові події та автосейв
+  setInterval(randomEvent, 180000 + Math.floor(Math.random() * 180000));
+  setInterval(saveGame, 10000);
+  window.addEventListener('beforeunload', saveGame);
+})();
 </script>
 </body>
-</html>
+  </html>
